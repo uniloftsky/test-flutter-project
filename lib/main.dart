@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:test_flutter_project/generators/color_generator.dart';
 
@@ -17,12 +19,8 @@ class _State extends State<MyApp> {
 
   var _color = Colors.white;
 
-  void _changeColor(Color color) {
-    setState(() => _color = color);
-  }
-
   void _onColorChange(Color color) {
-    _changeColor(color);
+    setState(() => _color = color);
     _showSnackBar();
   }
 
@@ -33,13 +31,92 @@ class _State extends State<MyApp> {
     ));
   }
 
+  Future _changeColorModal() async {
+    double _rValue = _color.red.toDouble();
+    double _gValue = _color.green.toDouble();
+    double _bValue = _color.blue.toDouble();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, innerSetState) {
+            return SimpleDialog(
+              title: new Text(
+                'Set the color values',
+                textAlign: TextAlign.center,
+              ),
+              children: [
+                new Column(
+                  children: [
+                    new Container(
+                      child: new Slider(
+                          value: _rValue,
+                          min: 0,
+                          max: 255,
+                          divisions: 255,
+                          onChanged: (double value) =>
+                              innerSetState(() => _rValue = value),
+                          activeColor: Colors.red,
+                          label: _rValue.round().toString()),
+                      width: 200,
+                    ),
+                    new Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
+                    new Container(
+                      child: new Slider(
+                          value: _gValue,
+                          min: 0,
+                          max: 255,
+                          divisions: 255,
+                          onChanged: (double value) =>
+                              innerSetState(() => _gValue = value),
+                          activeColor: Colors.green,
+                          label: _gValue.round().toString()),
+                      width: 200,
+                    ),
+                    new Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
+                    new Container(
+                      child: new Slider(
+                          value: _bValue,
+                          min: 0,
+                          max: 255,
+                          divisions: 255,
+                          onChanged: (double value) =>
+                              innerSetState(() => _bValue = value),
+                          activeColor: Colors.blue,
+                          label: _bValue.round().toString()),
+                      width: 200,
+                    ),
+                    new Padding(
+                      padding: EdgeInsets.all(10),
+                      child: new ElevatedButton(
+                        onPressed: () {
+                          _onColorChange(ColorGenerator.generateColor(
+                              red: _rValue.toInt(),
+                              green: _gValue.toInt(),
+                              blue: _bValue.toInt()));
+                          Navigator.pop(context);
+                        },
+                        child: new Text('Set the color'),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new GestureDetector(
       child: new Scaffold(
         key: _scaffoldState,
         appBar: new AppBar(
-          title: new Text('Name here'),
+          title: new Text('Flutter application'),
         ),
         body: new Container(
           child: new Center(
@@ -57,6 +134,7 @@ class _State extends State<MyApp> {
           red: ColorGenerator.random.nextInt(255),
           green: ColorGenerator.random.nextInt(255),
           blue: ColorGenerator.random.nextInt(255))),
+      onLongPress: _changeColorModal,
     );
   }
 }
