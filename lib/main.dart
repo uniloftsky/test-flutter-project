@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:test_flutter_project/generators/color_generator.dart';
 
@@ -36,7 +37,10 @@ class _State extends State<MyApp> {
         ),
         backgroundColor: _color,
       ),
-      onTap: () => _changeColor(ColorGenerator.generateColor()),
+      onTap: () => _changeColor(ColorGenerator.generateColor(
+          red: ColorGenerator.random.nextInt(255),
+          green: ColorGenerator.random.nextInt(255),
+          blue: ColorGenerator.random.nextInt(255))),
     );
   }
 }
