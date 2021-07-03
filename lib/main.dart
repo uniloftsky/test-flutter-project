@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:test_flutter_project/generators/color_generator.dart';
 
@@ -14,14 +13,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _State extends State<MyApp> {
-  Color _color = Colors.white;
+  final GlobalKey _scaffoldState = new GlobalKey<ScaffoldState>();
 
-  void _changeColor(Color color) => setState(() => _color = color);
+  var _color = Colors.white;
+
+  void _changeColor(Color color) {
+    setState(() => _color = color);
+  }
+
+  void _onColorChange(Color color) {
+    _changeColor(color);
+    _showSnackBar();
+  }
+
+  void _showSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
+      content: new Text('Color changed!'),
+      duration: new Duration(milliseconds: 250),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
     return new GestureDetector(
       child: new Scaffold(
+        key: _scaffoldState,
         appBar: new AppBar(
           title: new Text('Name here'),
         ),
@@ -37,7 +53,7 @@ class _State extends State<MyApp> {
         ),
         backgroundColor: _color,
       ),
-      onTap: () => _changeColor(ColorGenerator.generateColor(
+      onTap: () => _onColorChange(ColorGenerator.generateColor(
           red: ColorGenerator.random.nextInt(255),
           green: ColorGenerator.random.nextInt(255),
           blue: ColorGenerator.random.nextInt(255))),
