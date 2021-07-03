@@ -55,8 +55,10 @@ class _State extends State<MyApp> {
                           min: 0,
                           max: 255,
                           divisions: 255,
-                          onChanged: (double value) =>
-                              innerSetState(() => _rValue = value),
+                          onChanged: (double value) {
+                            innerSetState(() => _rValue = value);
+                            setState(() => _color = ColorGenerator.generateColor(red: _rValue.toInt(), green: _gValue.toInt(), blue: _bValue.toInt()));
+                          },
                           activeColor: Colors.red,
                           label: _rValue.round().toString()),
                       width: 200,
@@ -68,8 +70,10 @@ class _State extends State<MyApp> {
                           min: 0,
                           max: 255,
                           divisions: 255,
-                          onChanged: (double value) =>
-                              innerSetState(() => _gValue = value),
+                          onChanged: (double value) {
+                            innerSetState(() => _gValue = value);
+                            setState(() => _color = ColorGenerator.generateColor(red: _rValue.toInt(), green: _gValue.toInt(), blue: _bValue.toInt()));
+                          },
                           activeColor: Colors.green,
                           label: _gValue.round().toString()),
                       width: 200,
@@ -81,8 +85,10 @@ class _State extends State<MyApp> {
                           min: 0,
                           max: 255,
                           divisions: 255,
-                          onChanged: (double value) =>
-                              innerSetState(() => _bValue = value),
+                          onChanged: (double value) {
+                            innerSetState(() => _bValue = value);
+                            setState(() => _color = ColorGenerator.generateColor(red: _rValue.toInt(), green: _gValue.toInt(), blue: _bValue.toInt()));
+                          },
                           activeColor: Colors.blue,
                           label: _bValue.round().toString()),
                       width: 200,
@@ -97,7 +103,7 @@ class _State extends State<MyApp> {
                               blue: _bValue.toInt()));
                           Navigator.pop(context);
                         },
-                        child: new Text('Set the color'),
+                        child: new Text('Save'),
                       ),
                     )
                   ],
