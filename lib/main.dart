@@ -25,9 +25,9 @@ class _State extends State<MyApp> {
   }
 
   void _showSnackBar() {
-    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
-      content: new Text('Color changed!'),
-      duration: new Duration(milliseconds: 250),
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Color changed!'),
+      duration: Duration(milliseconds: 250),
     ));
   }
 
@@ -43,16 +43,16 @@ class _State extends State<MyApp> {
         return StatefulBuilder(
           builder: (context, innerSetState) {
             return WillPopScope(
-                child: new SimpleDialog(
-                  title: new Text(
+                child: SimpleDialog(
+                  title: Text(
                     'Set the color values',
                     textAlign: TextAlign.center,
                   ),
                   children: [
-                    new Column(
+                    Column(
                       children: [
-                        new Container(
-                          child: new Slider(
+                        Container(
+                          child: Slider(
                               value: _rValue,
                               min: 0,
                               max: 255,
@@ -69,10 +69,9 @@ class _State extends State<MyApp> {
                               label: _rValue.round().toString()),
                           width: 200,
                         ),
-                        new Padding(
-                            padding: EdgeInsets.only(top: 5, bottom: 5)),
-                        new Container(
-                          child: new Slider(
+                        Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
+                        Container(
+                          child: Slider(
                               value: _gValue,
                               min: 0,
                               max: 255,
@@ -89,10 +88,9 @@ class _State extends State<MyApp> {
                               label: _gValue.round().toString()),
                           width: 200,
                         ),
-                        new Padding(
-                            padding: EdgeInsets.only(top: 5, bottom: 5)),
-                        new Container(
-                          child: new Slider(
+                        Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
+                        Container(
+                          child: Slider(
                               value: _bValue,
                               min: 0,
                               max: 255,
@@ -109,9 +107,9 @@ class _State extends State<MyApp> {
                               label: _bValue.round().toString()),
                           width: 200,
                         ),
-                        new Padding(
+                        Padding(
                           padding: EdgeInsets.all(10),
-                          child: new ElevatedButton(
+                          child: ElevatedButton(
                             onPressed: () {
                               _onColorChange(ColorGenerator.generateColor(
                                   red: _rValue.toInt(),
@@ -119,7 +117,7 @@ class _State extends State<MyApp> {
                                   blue: _bValue.toInt()));
                               Navigator.pop(context);
                             },
-                            child: new Text('Save'),
+                            child: Text('Save'),
                           ),
                         )
                       ],
@@ -135,17 +133,17 @@ class _State extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return new GestureDetector(
-      child: new Scaffold(
+    return GestureDetector(
+      child: Scaffold(
         key: _scaffoldState,
-        appBar: new AppBar(
-          title: new Text('Flutter application'),
+        appBar: AppBar(
+          title: Text('Flutter application'),
         ),
-        body: new Container(
-          child: new Center(
-            child: new Text(
+        body: Container(
+          child: Center(
+            child: Text(
               'Hey there',
-              style: new TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
