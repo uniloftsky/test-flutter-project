@@ -14,3 +14,14 @@ Test task:
 5. Push code to a GitHub
 6. Send the link to a GitHub repository back
 ```
+
+## App preview
+
+Default behavior when user tap anywhere on the screen:<br><br>
+![Default behavior](https://raw.githubusercontent.com/uniloftsky/test-flutter-project/master/readme_resources/default_behaviour.gif)
+
+<hr>
+
+A feature that provides the user be able to change color background manually. To set the color user has to call for a modal form by a long tap on the screen. User cannot close the modal by tapping outside of it or by using "Back" button.<br><br>
+![Manual color setting](https://raw.githubusercontent.com/uniloftsky/test-flutter-project/master/readme_resources/manual.gif)
+
