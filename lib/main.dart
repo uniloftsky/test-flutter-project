@@ -14,6 +14,21 @@ class MyApp extends StatefulWidget {
   State createState() => new _State();
 }
 
+class ColorSlider {
+  double colorValue;
+  Color activeColour;
+
+  void onChange(double value, void Function(void Function()) innerSetState) {
+    innerSetState(() => colorValue = value);
+  }
+
+  String get label => colorValue.toString();
+
+  int get intColorValue => colorValue.toInt();
+
+  ColorSlider(this.colorValue, this.activeColour);
+}
+
 class _State extends State<MyApp> {
   final GlobalKey _scaffoldState = new GlobalKey<ScaffoldState>();
 
@@ -36,6 +51,51 @@ class _State extends State<MyApp> {
     double _gValue = _color.green.toDouble();
     double _bValue = _color.blue.toDouble();
 
+    final _colorSliders = [
+      ColorSlider(_rValue, Colors.red),
+      ColorSlider(_gValue, Colors.green),
+      ColorSlider(_bValue, Colors.blue),
+    ];
+
+    List<Widget> _createWidgetsForModal(
+        void Function(void Function()) innerSetState) {
+      final _slidersWithButton = List<Widget>.generate(
+        3,
+        (index) {
+          return Slider(
+            value: _colorSliders[index].colorValue,
+            min: 0,
+            max: 255,
+            label: _colorSliders[index].label,
+            onChanged: (value)
+                {
+                  _colorSliders[index].onChange(value, innerSetState);
+                  setState(() => _color = Color.fromRGBO(_colorSliders[0].intColorValue, _colorSliders[1].intColorValue, _colorSliders[2].intColorValue, 1));
+                },
+            activeColor: _colorSliders[index].activeColour,
+          );
+        },
+      );
+      _slidersWithButton.add(
+        ElevatedButton(
+          onPressed: () {
+            _onColorChange(
+              Color.fromRGBO(
+                  _colorSliders[0].intColorValue,
+                  _colorSliders[1].intColorValue,
+                  _colorSliders[2].intColorValue,
+                  1),
+            );
+            Navigator.pop(context);
+          },
+          child: Text('Save'),
+        ),
+      );
+      return _slidersWithButton;
+    }
+
+    List<Widget> _sliders;
+
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -49,79 +109,7 @@ class _State extends State<MyApp> {
                     textAlign: TextAlign.center,
                   ),
                   children: [
-                    Column(
-                      children: [
-                        Container(
-                          child: Slider(
-                              value: _rValue,
-                              min: 0,
-                              max: 255,
-                              divisions: 255,
-                              onChanged: (double value) {
-                                innerSetState(() => _rValue = value);
-                                setState(() => _color =
-                                    ColorGenerator.generateColor(
-                                        red: _rValue.toInt(),
-                                        green: _gValue.toInt(),
-                                        blue: _bValue.toInt()));
-                              },
-                              activeColor: Colors.red,
-                              label: _rValue.round().toString()),
-                          width: 200,
-                        ),
-                        Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
-                        Container(
-                          child: Slider(
-                              value: _gValue,
-                              min: 0,
-                              max: 255,
-                              divisions: 255,
-                              onChanged: (double value) {
-                                innerSetState(() => _gValue = value);
-                                setState(() => _color =
-                                    ColorGenerator.generateColor(
-                                        red: _rValue.toInt(),
-                                        green: _gValue.toInt(),
-                                        blue: _bValue.toInt()));
-                              },
-                              activeColor: Colors.green,
-                              label: _gValue.round().toString()),
-                          width: 200,
-                        ),
-                        Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
-                        Container(
-                          child: Slider(
-                              value: _bValue,
-                              min: 0,
-                              max: 255,
-                              divisions: 255,
-                              onChanged: (double value) {
-                                innerSetState(() => _bValue = value);
-                                setState(() => _color =
-                                    ColorGenerator.generateColor(
-                                        red: _rValue.toInt(),
-                                        green: _gValue.toInt(),
-                                        blue: _bValue.toInt()));
-                              },
-                              activeColor: Colors.blue,
-                              label: _bValue.round().toString()),
-                          width: 200,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              _onColorChange(ColorGenerator.generateColor(
-                                  red: _rValue.toInt(),
-                                  green: _gValue.toInt(),
-                                  blue: _bValue.toInt()));
-                              Navigator.pop(context);
-                            },
-                            child: Text('Save'),
-                          ),
-                        )
-                      ],
-                    ),
+                    Column(children: _createWidgetsForModal(innerSetState)),
                   ],
                 ),
                 onWillPop: () async => false);
@@ -151,10 +139,12 @@ class _State extends State<MyApp> {
         ),
         backgroundColor: _color,
       ),
-      onTap: () => _onColorChange(ColorGenerator.generateColor(
-          red: ColorGenerator.random.nextInt(255),
-          green: ColorGenerator.random.nextInt(255),
-          blue: ColorGenerator.random.nextInt(255))),
+      onTap: () => _onColorChange(Color.fromRGBO(
+        ColorGenerator.random.nextInt(255),
+        ColorGenerator.random.nextInt(255),
+        ColorGenerator.random.nextInt(255),
+        1,
+      )),
       onLongPress: _changeColorModal,
     );
   }
