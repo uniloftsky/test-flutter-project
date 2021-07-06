@@ -15,43 +15,25 @@ class MyApp extends StatefulWidget {
 }
 
 class ColorSlider {
-  late Widget slider;
+  double colorValue;
+  Color activeColour;
 
-  ColorSlider(double colorValue, Color activeColor,
-      void Function(double value) setState) {
-    this.slider = StatefulBuilder(
-      builder: (context, innerSetState) {
-        return Slider(
-          value: colorValue,
-          activeColor: activeColor,
-          min: 0,
-          max: 255,
-          divisions: 255,
-          label: colorValue.round().toString(),
-          onChanged: (value) {
-            innerSetState(() => colorValue = value);
-            setState(value);
-          },
-        );
-      },
-    );
+  void onChange(double value, void Function(void Function()) innerSetState) {
+    innerSetState(() => colorValue = value);
   }
+
+  String get label => colorValue.toString();
+
+  int get intColorValue => colorValue.toInt();
+
+  ColorSlider(this.colorValue, this.activeColour);
 }
 
 class _State extends State<MyApp> {
   final GlobalKey _scaffoldState = new GlobalKey<ScaffoldState>();
-  static final random = Random();
+  final random = Random();
 
-  late Color _color;
-  late double _rValue, _gValue, _bValue;
-
-  @override
-  void initState() {
-    _color = Colors.white;
-    _rValue = _color.red.toDouble();
-    _gValue = _color.green.toDouble();
-    _bValue = _color.blue.toDouble();
-  }
+  var _color = Colors.white;
 
   void _onColorChange(Color color) {
     setState(() => _color = color);
@@ -65,65 +47,75 @@ class _State extends State<MyApp> {
     ));
   }
 
-  void _onSliderColorChange() => setState(() => _color =
-      Color.fromRGBO(_rValue.toInt(), _gValue.toInt(), _bValue.toInt(), 1));
-
   Future _changeColorModal() async {
+    double _rValue = _color.red.toDouble();
+    double _gValue = _color.green.toDouble();
+    double _bValue = _color.blue.toDouble();
+
+    final _colorSliders = [
+      ColorSlider(_rValue, Colors.red),
+      ColorSlider(_gValue, Colors.green),
+      ColorSlider(_bValue, Colors.blue),
+    ];
+
+    List<Widget> _createWidgetsForModal(
+        void Function(void Function()) innerSetState) {
+      final _slidersWithButton = List<Widget>.generate(
+        3,
+            (index) {
+          return Slider(
+            value: _colorSliders[index].colorValue,
+            min: 0,
+            max: 255,
+            label: _colorSliders[index].label,
+            onChanged: (value)
+            {
+              _colorSliders[index].onChange(value, innerSetState);
+              setState(() => _color = Color.fromRGBO(_colorSliders[0].intColorValue, _colorSliders[1].intColorValue, _colorSliders[2].intColorValue, 1));
+            },
+            activeColor: _colorSliders[index].activeColour,
+          );
+        },
+      );
+      _slidersWithButton.add(
+        ElevatedButton(
+          onPressed: () {
+            _onColorChange(
+              Color.fromRGBO(
+                  _colorSliders[0].intColorValue,
+                  _colorSliders[1].intColorValue,
+                  _colorSliders[2].intColorValue,
+                  1),
+            );
+            Navigator.pop(context);
+          },
+          child: Text('Save'),
+        ),
+      );
+      return _slidersWithButton;
+    }
+
+    List<Widget> _sliders;
+
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return WillPopScope(
-            child: SimpleDialog(
-              title: Text(
-                'Set the color values',
-                textAlign: TextAlign.center,
-              ),
-              children: [
-                Column(
+        return StatefulBuilder(
+          builder: (context, innerSetState) {
+            return WillPopScope(
+                child: SimpleDialog(
+                  title: Text(
+                    'Set the color values',
+                    textAlign: TextAlign.center,
+                  ),
                   children: [
-                    Container(
-                      child: ColorSlider(_color.red.toDouble(), Colors.red,
-                          (colorValue) {
-                        _rValue = colorValue;
-                        _onSliderColorChange();
-                      }).slider,
-                      width: 200,
-                    ),
-                    Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
-                    Container(
-                      child: ColorSlider(_color.green.toDouble(), Colors.green,
-                          (colorValue) {
-                        _gValue = colorValue;
-                        _onSliderColorChange();
-                      }).slider,
-                      width: 200,
-                    ),
-                    Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
-                    Container(
-                      child: ColorSlider(_color.blue.toDouble(), Colors.blue,
-                          (colorValue) {
-                        _bValue = colorValue;
-                        _onSliderColorChange();
-                      }).slider,
-                      width: 200,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _onColorChange(Color.fromRGBO(_rValue.toInt(),
-                              _gValue.toInt(), _bValue.toInt(), 1));
-                          Navigator.pop(context);
-                        },
-                        child: Text('Save'),
-                      ),
-                    )
+                    Column(children: _createWidgetsForModal(innerSetState)),
                   ],
                 ),
-              ],
-            ),
-            onWillPop: () async => false);
+                onWillPop: () async => false);
+          },
+        );
       },
     );
   }
@@ -149,7 +141,11 @@ class _State extends State<MyApp> {
         backgroundColor: _color,
       ),
       onTap: () => _onColorChange(Color.fromRGBO(
-          random.nextInt(255), random.nextInt(255), random.nextInt(255), 1)),
+        random.nextInt(255),
+        random.nextInt(255),
+        random.nextInt(255),
+        1,
+      )),
       onLongPress: _changeColorModal,
     );
   }
